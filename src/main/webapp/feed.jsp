@@ -15,19 +15,6 @@
     </head>
     <body>
         <h1><%out.println(request.getParameter("username") + "'s Feed");%></h1>
-        <%
-            File dir = new File("C:\\Users\\Administrator\\Documents\\NetBeansProjects\\happydayapp4\\src\\main\\webapp\\" + request.getParameter("username"));
-            File[] directoryListing = dir.listFiles();
-            if(directoryListing != null){
-                for(File file : directoryListing){
-                    %>
-                    <img onmouseover="preview.src=<%=file.getName().replaceFirst("[.][^.]+$", "")%>.src" 
-                         name="<%=file.getName().replaceFirst("[.][^.]+$", "")%>" src="images/<%=file.getName()%>" alt=""/>
-                    <%
-                }
-            } else {
-                out.println("No Pictures");
-            }
-        %>
+        
     </body>
 </html>

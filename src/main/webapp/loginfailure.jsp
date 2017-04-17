@@ -1,6 +1,6 @@
 <%-- 
-    Document   : signupsuccess
-    Created on : Mar 28, 2017, 3:29:16 PM
+    Document   : loginfailure
+    Created on : Apr 6, 2017, 6:46:08 PM
     Author     : Administrator
 --%>
 
@@ -12,7 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Registered!</h1>
-        <p><a href ="index.html">Login!</a></p>
+        <h1>Failed to log in.</h1>
     </body>
 </html>

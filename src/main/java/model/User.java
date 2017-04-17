@@ -10,10 +10,10 @@ package model;
  *
  * @author Administrator
  */
-public class NewUser {
+public class User {
     private String email, first, last, user, password;
     
-    public NewUser(){
+    public User(){
         email = "";
         first = "";
         last = "";
@@ -21,7 +21,7 @@ public class NewUser {
         password = "";
     }
     
-    public NewUser(String email, String first, String last, String user, String password){
+    public User(String email, String first, String last, String user, String password){
         this.email = email;
         this.first = first;
         this.last = last;
