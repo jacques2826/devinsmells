@@ -105,6 +105,30 @@ public class Controller extends HttpServlet{
                 }
            
             
+        }else if(action.equalsIgnoreCase("upload")){
+            System.out.println("controller:Upload");
+            String filepath = "C:\\Users\\Administrator\\Documents\\NetBeansProjects\\happydayapp4\\src\\main\\webapp\\" + request.getParameter("username");
+            System.out.println(filepath);
+            
+            if(ServletFileUpload.isMultipartContent(request)){
+                System.out.println("controller:Upload:Uploading...");
+                try{
+                    List<FileItem> fileItems = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
+                    for(FileItem item : fileItems){
+                        if(!item.isFormField()){
+                            String name = new File(item.getName()).getName();
+                            item.write(new File(filepath + File.separator + name));
+                        }
+                    }
+                    //request.setAttribute("message", "File Uploaded Successfully");
+                    System.out.println("File Uploaded Successsfully");
+                    url = "/feed.jsp";
+                } catch (Exception ex){
+                    //request.setAttribute("message", "File Upload Failed due to " + ex);
+                    System.out.println("File not uploaded: " + ex.toString());
+                    url = "/homepage.jsp";
+                }
+            }
         }else if (action.equalsIgnoreCase("logout")){
         System.out.println("controller:Logout");
         HttpSession sessionUser = request.getSession(false);
@@ -116,72 +140,8 @@ public class Controller extends HttpServlet{
         }
         url = "/index.html";
            
-        }else if(action.equalsIgnoreCase("upload")){
-            System.out.println("controller:Upload");
-            String filepath = "C:\\Users\\Administrator\\Documents\\NetBeansProjects\\happydayapp4\\src\\main\\webapp\\" + request.getParameter("username");
-            if(ServletFileUpload.isMultipartContent(request)){
-                try{
-                    List<FileItem> fileItems = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-                    for(FileItem item : fileItems){
-                        if(!item.isFormField()){
-                            String name = new File(item.getName()).getName();
-                            item.write(new File(filepath + File.separator + name));
-                        }
-                    }
-                    request.setAttribute("message", "File Uploaded Successfully");
-                    System.out.println("File Uploaded Successsfully");
-                    url = "/feed.jsp";
-                } catch (Exception ex){
-                    request.setAttribute("message", "File Upload Failed due to " + ex);
-                    System.out.println("File not uploaded: " + ex.toString());
-                    url = "/homepage.jsp";
-                }
-            }
-            /*System.out.println("controller:Upload");
-            File file; 
-            int maxFileSize = 5000 * 1024;
-            int maxMemSize = 5000 * 1024;
-            ServletContext context = request.getServletContext();
-            String filePath = context.getInitParameter("file-upload") + request.getParameter("username"); 
-            String contentType = request.getContentType();
-            if((contentType.indexOf("multipart/form-data") >= 0)){
-                DiskFileItemFactory factory = new DiskFileItemFactory();
-                factory.setSizeThreshold(maxMemSize);
-                factory.setRepository(new File("c:\\temp"));
-                
-                ServletFileUpload upload = new ServletFileUpload(factory);
-                upload.setSizeMax(maxFileSize);
-                try{
-                    List fileItems = upload.parseRequest(request);
-                    Iterator i = fileItems.iterator();
-                    System.out.println("JSP File Upload");
-                    while (i.hasNext()){
-                        FileItem fi = (FileItem)i.next();
-                        if(!fi.isFormField()){
-                            String field = fi.getFieldName();
-                            String fileName = fi.getName();
-                            boolean inMemory = fi.isInMemory();
-                            long size = fi.getSize();
-                            if(fileName.lastIndexOf("\\") >= 0){
-                                file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\")));
-                            }else{
-                                file = new File(filePath + fileName.substring(fileName.lastIndexOf("\\") + 1));
-                            }
-                            fi.write(file);
-                            System.out.println("Uploaded Filename: " + filePath + fileName);
-                        }
-                    }
-                }catch(Exception ex){
-                    System.out.println("Error in userAction=upload: " + ex.toString());
-                }
-                System.out.println("file uploaded");
-                url = "/feed.jsp";
-            }else{
-                System.out.println("controller:Upload - no file uploaded");
-                url = "/homepage.jsp";
-            }*/
-        }
         
+        }
         RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
         dispatcher.forward(request, response);
         
