@@ -5,6 +5,8 @@
  */
 package model;
 
+import java.io.File;
+import java.io.InputStream;
 import model.User;
 
 import java.sql.Connection;
@@ -42,7 +44,7 @@ public class DAOHappyDayLog {
             Logger.getLogger(DAOHappyDayLog.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
+  
     public static boolean userLogin(String username, String password){
         boolean user = false;
         try {
@@ -58,4 +60,36 @@ public class DAOHappyDayLog {
         }
         return user;
     }
+    
+        public static void addUserTable(User user){
+        System.out.println("Adding new User Table");
+        final String QUERY = "CREATE TABLE " + user.getUser() + "("
+                + "id INT(64) NOT NULL AUTO_INCREMENT, "
+                + "img BLOB NOT NULL, "
+                + "caption VARCHAR(140), "
+                + "PRIMARY KEY(id));";
+        try(
+                Connection connection = DBConnection.getConnection();
+                PreparedStatement statement = connection.prepareStatement(QUERY);){
+            statement.executeUpdate();
+        } catch(SQLException ex){
+            System.out.println("Error in addUserTable(): " + ex.toString());
+        }
+    }
+        
+        public static void addPicture(InputStream inputStream, String username, String caption){
+            System.out.println("Adding photo");
+            final String QUERY = "insert into " + username + " (id, img, caption) values (null, ?, ?)";
+            try(
+                    Connection connection = DBConnection.getConnection();
+                    PreparedStatement statement = connection.prepareStatement(QUERY);){
+                if(inputStream != null){
+                    statement.setBlob(2, inputStream);
+                }
+                statement.setString(3, caption);
+                statement.executeUpdate();
+            } catch(SQLException ex){
+                System.out.println("Error in addPicture(): " + ex.toString());
+            }
+        }
 }

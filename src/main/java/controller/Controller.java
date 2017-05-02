@@ -9,6 +9,7 @@ import java.io.File;
 import model.User;
 import model.DAOHappyDayLog;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.util.List;
@@ -31,7 +32,7 @@ import org.apache.commons.io.output.*;
  * @author Administrator
  */
 public class Controller extends HttpServlet{
-    
+    private final String filepath = "C:\\Users\\Administrator\\Documents\\NetBeansProjects\\happydayapp4\\src\\main\\webapp\\walterd04";
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
@@ -64,13 +65,16 @@ public class Controller extends HttpServlet{
                 System.out.println("Controller:sign up error");
             } else {
                 DAOHappyDayLog.newUser(newUser);
-                url = "/signupsuccess.jsp";
+                DAOHappyDayLog.addUserTable(newUser);
+                url = "/login.html";
                 request.setAttribute("newUser", newUser);
                 System.out.println("Controller: adding new user");
                 File newDirectory = new File("C:\\Users\\Administrator\\Documents\\NetBeansProjects\\happydayapp4\\src\\main\\webapp\\"
                         + request.getParameter("username"));
                 newDirectory.mkdir();
             }
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+            dispatcher.forward(request, response);
         } else if(action.equalsIgnoreCase("login")){
             PrintWriter out = response.getWriter();
             System.out.println("controller:Login");
@@ -102,34 +106,31 @@ public class Controller extends HttpServlet{
                 } else {
                     url = "/loginfailure.jsp";
                     System.out.println("controller:Login Failed");
-                }
-           
+                } 
+                RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+                dispatcher.forward(request, response);
+                
+        } else if (action.equalsIgnoreCase("upload")){
+            String username = request.getParameter("username");
+            String caption = request.getParameter("caption");
+            System.out.println(username);
             
-        }else if(action.equalsIgnoreCase("upload")){
-            System.out.println("controller:Upload");
-            String filepath = "C:\\Users\\Administrator\\Documents\\NetBeansProjects\\happydayapp4\\src\\main\\webapp\\" + request.getParameter("username");
-            System.out.println(filepath);
+            InputStream inputStream = null;
             
-            if(ServletFileUpload.isMultipartContent(request)){
-                System.out.println("controller:Upload:Uploading...");
-                try{
-                    List<FileItem> fileItems = new ServletFileUpload(new DiskFileItemFactory()).parseRequest(request);
-                    for(FileItem item : fileItems){
-                        if(!item.isFormField()){
-                            String name = new File(item.getName()).getName();
-                            item.write(new File(filepath + File.separator + name));
-                        }
-                    }
-                    //request.setAttribute("message", "File Uploaded Successfully");
-                    System.out.println("File Uploaded Successsfully");
-                    url = "/feed.jsp";
-                } catch (Exception ex){
-                    //request.setAttribute("message", "File Upload Failed due to " + ex);
-                    System.out.println("File not uploaded: " + ex.toString());
-                    url = "/homepage.jsp";
-                }
+            Part filePart = request.getPart("file");
+            if (filePart != null){
+                System.out.println(filePart.getName());
+                System.out.println(filePart.getSize());
+                System.out.println(filePart.getContentType());
+                inputStream = filePart.getInputStream();
             }
-        }else if (action.equalsIgnoreCase("logout")){
+            DAOHappyDayLog.addPicture(inputStream, username, caption);
+            url = "/homepage.jsp";
+            RequestDispatcher dispatcher = getServletContext().getRequestDispatcher(url);
+            dispatcher.forward(request, response);
+            
+            
+        } else if (action.equalsIgnoreCase("logout")){
         System.out.println("controller:Logout");
         HttpSession sessionUser = request.getSession(false);
         if(sessionUser != null){
@@ -173,6 +174,7 @@ public class Controller extends HttpServlet{
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
+        
     }
 
     /**
